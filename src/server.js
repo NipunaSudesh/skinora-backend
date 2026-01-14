@@ -25,7 +25,7 @@ app.use(express.json());
 app.use("/api/getproducts", productRoutes);
 app.use("/api/getcategories", CategoryRoutes);
 app.use("/api/getcatalogs", CatalogRoutes);
-console.log("Catalog routes loaded", "http://localhost:3000/api/getcatalogs");
+app.use("/api/getproduct/:slug", productRoutes);
 
 // test route
 app.get("/", (req, res) => {
