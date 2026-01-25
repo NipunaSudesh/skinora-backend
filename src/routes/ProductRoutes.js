@@ -11,5 +11,6 @@ router.post("/", addProduct);
 
 // GET: get all products
 router.get("/", getProducts);
+router.get("/:slug", getProductBySlug);
 
 export default router;
