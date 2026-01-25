@@ -1,9 +1,10 @@
 import express from 'express';
-import {  getCategories } from '../controllers/categoryController.js';
+import {  getCategories,getProductsByCategorySlug } from '../controllers/categoryController.js';
 import { get } from 'mongoose';
 
 const router =express.Router();
 // GET: get all categories
 router.get('/',getCategories);
+router.get("/:categorySlug", getProductsByCategorySlug);
 
 export default router;
