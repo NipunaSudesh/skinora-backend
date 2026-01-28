@@ -1,5 +1,18 @@
 import mongoose from "mongoose";
 
+const cartItemSchema = new mongoose.Schema({
+  product: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Product",
+    required: true,
+  },
+  qty: {
+    type: Number,
+    default: 1,
+    min: 1,
+  },
+});
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -21,7 +34,12 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
+
+  cart:{
+    type: [cartItemSchema],
+    default: [],
   },
+    },
   { timestamps: true }
 );
 
