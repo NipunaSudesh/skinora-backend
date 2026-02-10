@@ -21,7 +21,8 @@ app.use(
        "http://localhost:5173", 
       "https://skinora-react.netlify.app",
       "https://skin-ora-vue.vercel.app/",
-      "https://skinora-vue.netlify.app/"
+      "https://skinora-vue.netlify.app/",
+      "https://skin-ora-react.vercel.app/"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
