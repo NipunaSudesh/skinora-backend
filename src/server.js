@@ -19,7 +19,7 @@ app.use(
     origin: [
       "http://localhost:3000",
        "http://localhost:5173", 
-      "https://skinora-react.netlify.app"
+      "https://skinora-react.netlify.app",
       "https://skinora-vue.netlify.app/"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
