@@ -26,24 +26,21 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // allow Postman / server-to-server
+    origin: (origin, callback) => {
+      // Allow Postman / server-side requests
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        callback(new Error("CORS not allowed"));
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
-
-// IMPORTANT: handle preflight requests
-app.options("*", cors());
 
 /* ================== MIDDLEWARE ================== */
 
