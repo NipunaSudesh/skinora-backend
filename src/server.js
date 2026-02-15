@@ -13,43 +13,69 @@ dotenv.config();
 
 const app = express();
 
-/* -------------------- MIDDLEWARE -------------------- */
+/* ================== CORS CONFIG ================== */
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "https://skinora-react.netlify.app",
+  "https://skin-ora-vue.vercel.app",
+  "https://skinora-vue.netlify.app",
+  "https://skin-ora-react.vercel.app",
+  "http://localhost:4200",
+  "https://skin-ora-angular.vercel.app",
+  "https://skinora-angular.vercel.app"
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://skinora-react.netlify.app"
-    ],
+    origin: (origin, callback) => {
+      // Allow Postman / server-side requests
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
+    allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 
+/* ================== MIDDLEWARE ================== */
+
 app.use(express.json());
 
-/* -------------------- ROUTES -------------------- */
+/* ================== ROUTES ================== */
+
 app.use("/api/products", productRoutes);
 app.use("/api/categories", CategoryRoutes);
 app.use("/api/catalogs", CatalogRoutes);
 app.use("/api/auth", UserRoutes);
 app.use("/api/cart", cartRoutes);
 
-/* -------------------- TEST ROUTE -------------------- */
+/* ================== TEST ROUTE ================== */
+
 app.get("/", (req, res) => {
   res.status(200).send("SkinOra API running 🚀");
 });
 
-/* -------------------- SERVER + DB -------------------- */
+/* ================== DB + SERVER ================== */
+
 const PORT = process.env.PORT || 10000;
 
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
+
     app.listen(PORT, () => {
-      console.log(` 🚀Server running on port ${PORT}`);
+      console.log(`🚀 Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error(" MongoDB connection error:", err.message);
+    console.error("❌ MongoDB connection error:", err.message);
   });
