@@ -21,7 +21,9 @@ const allowedOrigins = [
   "https://skinora-react.netlify.app",
   "https://skin-ora-vue.vercel.app",
   "https://skinora-vue.netlify.app",
-  "https://skin-ora-react.vercel.app"
+  "https://skin-ora-react.vercel.app",
+  "https://skin-ora-angular.vercel.app",
+  "http://localhost:4200"
 ];
 
 app.use(
