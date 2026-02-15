@@ -22,9 +22,9 @@ const allowedOrigins = [
   "https://skin-ora-vue.vercel.app",
   "https://skinora-vue.netlify.app",
   "https://skin-ora-react.vercel.app",
-  "http://localhost:4200",
   "https://skin-ora-angular.vercel.app",
-  "https://skinora-angular.vercel.app"
+  "https://skinora-angular.vercel.app",
+  "http://localhost:4200"
 ];
 
 app.use(
@@ -78,4 +78,8 @@ mongoose
   })
   .catch((err) => {
     console.error("❌ MongoDB connection error:", err.message);
+<<<<<<< HEAD
   });
+=======
+  });
+>>>>>>> e67428f0b888c14813f3717e15e2edb6aebbb3af
