@@ -23,6 +23,7 @@ const allowedOrigins = [
   "https://skinora-vue.netlify.app",
   "https://skin-ora-react.vercel.app",
   "https://skin-ora-angular.vercel.app",
+  "https://skinora-angular.vercel.app",
   "http://localhost:4200"
 ];
 
