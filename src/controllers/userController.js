@@ -136,3 +136,59 @@ export const editProfile = async (req, res) => {
     });
   }
 };
+
+export const placeOrder = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { items, totalAmount, shippingInfo } = req.body;
+
+    if (!items || items.length === 0) {
+      return res.status(400).json({ message: "No items to order" });
+    }
+
+    const user = await User.findById(userId);
+
+    const newOrder = {
+      items,
+      totalAmount,
+      shippingInfo,
+      status: "pending",
+      placedAt: new Date(),
+    };
+
+    //  Save order
+    user.orders.push(newOrder);
+
+    //  Clear cart after placing order
+    user.cart = [];
+
+    await user.save();
+
+    res.status(201).json({
+      message: "Order placed successfully",
+      order: newOrder,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+export const getMyOrders = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate(
+      "orders.items.product",
+      "name price image"
+    );
+
+    res.status(200).json({
+      orders: user.orders,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
