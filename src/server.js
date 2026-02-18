@@ -78,8 +78,4 @@ mongoose
   })
   .catch((err) => {
     console.error("❌ MongoDB connection error:", err.message);
-<<<<<<< HEAD
   });
-=======
-  });
->>>>>>> e67428f0b888c14813f3717e15e2edb6aebbb3af
