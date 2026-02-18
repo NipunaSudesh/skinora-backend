@@ -24,7 +24,8 @@ const allowedOrigins = [
   "https://skin-ora-react.vercel.app",
   "https://skin-ora-angular.vercel.app",
   "https://skinora-angular.vercel.app",
-  "http://localhost:4200"
+  "http://localhost:4200",
+  "https://skinora-react.vercel.app",
 ];
 
 app.use(
