@@ -8,6 +8,7 @@ import CategoryRoutes from "./routes/CategoriesRoute.js";
 import CatalogRoutes from "./routes/CatalogRoute.js";
 import UserRoutes from "./routes/UserRoute.js";
 import cartRoutes from "./routes/cartRoutes.js";
+import AdminRoutes from "./routes/AdminRoutes.js";
 
 dotenv.config();
 
@@ -57,6 +58,7 @@ app.use("/api/categories", CategoryRoutes);
 app.use("/api/catalogs", CatalogRoutes);
 app.use("/api/auth", UserRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/admin", AdminRoutes);
 
 /* ================== TEST ROUTE ================== */
 
