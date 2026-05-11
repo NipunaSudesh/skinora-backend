@@ -1,4 +1,5 @@
 import User from "../models/userModel.js";
+import Order from "../models/orderModel.js";
 import bcrypt, { compare } from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -53,7 +54,11 @@ export const login =async (req, res)=>{
              return res.status(400).json({ message: "Invalid credentials" });
         }
                 const token = jwt.sign(
-        { id: user._id },
+        { id: user._id ,
+          name: user.name,
+          email: user.email,
+            role: user.role
+        },
         process.env.JWT_SECRET,
         { expiresIn: "28d" }
         );
@@ -137,18 +142,94 @@ export const editProfile = async (req, res) => {
   }
 };
 
+// export const placeOrder = async (req, res) => {
+//   try {
+//     const userId = req.user.id;
+//     const { items, totalAmount, shippingInfo } = req.body;
+
+//     if (!items || items.length === 0) {
+//       return res.status(400).json({ message: "No items to order" });
+//     }
+
+//     const user = await User.findById(userId);
+
+//     const newOrder = {
+//       items,
+//       totalAmount,
+//       shippingInfo,
+//       status: "pending",
+//       placedAt: new Date(),
+//     };
+
+//     //  Save order
+//     user.orders.push(newOrder);
+
+//     //  Clear cart after placing order
+//     user.cart = [];
+
+//     await user.save();
+
+//     res.status(201).json({
+//       message: "Order placed successfully",
+//       order: newOrder,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Server error",
+//       error: error.message,
+//     });
+//   }
+// };
+
 export const placeOrder = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { items, totalAmount, shippingInfo } = req.body;
+    const userId = req.user?.id;
+    const { shippingInfo } = req.body;
 
-    if (!items || items.length === 0) {
-      return res.status(400).json({ message: "No items to order" });
+    // ✅ Check auth
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const user = await User.findById(userId);
+    // ✅ Get user with populated cart
+    const user = await User.findById(userId).populate({
+      path: "cart.product",
+      select: "price name",
+    });
 
-    const newOrder = {
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.cart || user.cart.length === 0) {
+      return res.status(400).json({ message: "Cart is empty" });
+    }
+
+    // ✅ Build items safely
+    const items = [];
+
+    for (const item of user.cart) {
+      if (!item.product) {
+        return res.status(400).json({
+          message: "Some products in cart are invalid or deleted",
+        });
+      }
+
+      items.push({
+        product: item.product._id,
+        qty: item.qty,
+        price: item.product.price,
+      });
+    }
+
+    // ✅ Calculate total securely
+    const totalAmount = items.reduce(
+      (total, item) => total + item.qty * item.price,
+      0
+    );
+
+    // ✅ Order data
+    const orderData = {
       items,
       totalAmount,
       shippingInfo,
@@ -156,39 +237,70 @@ export const placeOrder = async (req, res) => {
       placedAt: new Date(),
     };
 
-    //  Save order
-    user.orders.push(newOrder);
+    // ✅ 1. Save in Order collection
+    const createdOrder = await Order.create({
+      user: userId,
+      ...orderData,
+    });
 
-    //  Clear cart after placing order
+    // ✅ 2. Save inside user.orders (your requirement)
+    if (!user.orders) {
+      user.orders = [];
+    }
+
+    user.orders.push(orderData);
+
+    // ✅ Clear cart
     user.cart = [];
 
     await user.save();
 
     res.status(201).json({
       message: "Order placed successfully",
-      order: newOrder,
+      order: createdOrder,
     });
   } catch (error) {
+    console.error("PLACE ORDER ERROR:", error);
+
     res.status(500).json({
-      message: "Server error",
-      error: error.message,
+      message: error.message || "Server error",
     });
   }
 };
+// export const getMyOrders = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user.id).populate(
+//       "orders.items.product",
+//       "name price image"
+//     );
+
+//     res.status(200).json({
+//       orders: user.orders,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Server error",
+//       error: error.message,
+//     });
+//   }
+// };
 export const getMyOrders = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).populate(
-      "orders.items.product",
-      "name price image"
-    );
+    const userId = req.user.id;
+
+    // ✅ Get orders from Order collection
+    const orders = await Order.find({ user: userId })
+      .populate("items.product", "name price image")
+      .sort({ createdAt: -1 }); // latest first
 
     res.status(200).json({
-      orders: user.orders,
+      orders,
     });
   } catch (error) {
+    console.error("GET MY ORDERS ERROR:", error);
+
     res.status(500).json({
-      message: "Server error",
-      error: error.message,
+      message: error.message || "Server error",
     });
   }
 };

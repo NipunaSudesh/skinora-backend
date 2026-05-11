@@ -98,6 +98,10 @@ const productSchema = new mongoose.Schema(
       enum: ["IN_STOCK", "OUT_OF_STOCK"],
       default: "IN_STOCK"
     },
+    qty: {
+  type: Number,
+  default: 0,
+},
 
     wishlist: {
       type: Boolean,
@@ -108,7 +112,10 @@ const productSchema = new mongoose.Schema(
       type: String,
       trim: true
     },
-
+createdAt: {
+  type: Date,
+  default: Date.now,
+},
     tags: [
       {
         type: String,

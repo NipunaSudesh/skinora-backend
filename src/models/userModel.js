@@ -13,59 +13,6 @@ const cartItemSchema = new mongoose.Schema({
   },
 });
 
-const orderItemSchema = new mongoose.Schema({
-  product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
-    required: true,
-  },
-  qty: {
-    type: Number,
-    required: true,
-    min: 1,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-});
-
-const shippingSchema = new mongoose.Schema(
-  {
-    firstName: String,
-    lastName: String,
-    phone: String,
-    email: String,
-    address: String,
-  },
-  { _id: false }
-);
-
-const orderSchema = new mongoose.Schema(
-  {
-    items: [orderItemSchema],
-
-    totalAmount: {
-      type: Number,
-      required: true,
-    },
-
-    shippingInfo: shippingSchema,
-
-    status: {
-      type: String,
-      enum: ["pending", "paid", "shipped", "delivered", "cancelled"],
-      default: "pending",
-    },
-
-    placedAt: {
-      type: Date,
-      default: Date.now,
-    },
-  },
-  { _id: false }
-);
-
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -88,12 +35,14 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
     },
 
+    role: {
+      type: String,
+      enum: ["user", "admin","superadmin"],
+      default: "user",
+    },
+
     cart: {
       type: [cartItemSchema],
-      default: [],
-    },
-    orders: {
-      type: [orderSchema],
       default: [],
     },
   },
