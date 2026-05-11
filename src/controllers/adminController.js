@@ -155,7 +155,7 @@ export const getAllUsers = async (req,res)=>{
       success: true,
       data: users,
       stats: {
-        total: totalUsers,
+        total: totalAllUsers,
         users: totalUsers,
         admins: totalAdmins,
         superAdmins: totalSuperAdmins
