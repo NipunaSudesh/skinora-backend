@@ -143,3 +143,29 @@ export const getDashboardStats = async (req, res) => {
     });
   }
 };
+
+export const getAllUsers = async (req,res)=>{
+  try {
+    const users = await User.find().select("name email role createdAt").lean();
+    const totalAllUsers = await User.countDocuments();
+    const totalUsers = await User.countDocuments({role:"user"});
+    const totalAdmins = await User.countDocuments({ role: "admin" });
+    const totalSuperAdmins = await User.countDocuments({ role: "superadmin" });
+    res.json({
+      success: true,
+      data: users,
+      stats: {
+        total: totalUsers,
+        users: totalUsers,
+        admins: totalAdmins,
+        superAdmins: totalSuperAdmins
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching users",
+      error: error.message,
+    });
+  }
+}
