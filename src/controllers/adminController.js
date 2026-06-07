@@ -169,3 +169,29 @@ export const getAllUsers = async (req,res)=>{
     });
   }
 }
+
+export const deleteUser =async (req,res)=>{
+  try {
+    const { id } = req.params;
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if(!deleteUser){
+      return res.stats(404).json({
+        success: false,
+        massage :"User Not Found!."
+      })
+    }
+    res.stats(200).json({
+      success :true,
+      massage : "User Deleted Successfully!.",
+      data : deletedUser
+    })
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting user",
+      error: error.message,
+    });
+  }
+}
