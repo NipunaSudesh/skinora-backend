@@ -2,6 +2,7 @@ import User from "../models/userModel.js";
 import Product from "../models/productModel.js";
 import Category from "../models/categoryModel.js";
 import Order from "../models/orderModel.js";
+import cloudinary from "../config/cloudinary.cjs";
 
 export const getDashboardStats = async (req, res) => {
   try {
@@ -225,3 +226,117 @@ export const updateUser = async (req,res)=>{
   }
 }
 
+// productController.js
+
+export const createProduct = async (req, res) => {
+  try {
+    let imageUrl = "";
+
+    // 1. upload image
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(
+        `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+        { folder: "products" }
+      );
+
+      imageUrl = result.secure_url;
+    }
+
+    // 2. parse nested JSON fields (IMPORTANT FIX)
+    let longDescription = req.body.longDescription;
+
+    if (typeof longDescription === "string") {
+      longDescription = JSON.parse(longDescription);
+    }
+
+    let tags = req.body.tags;
+    if (typeof tags === "string") {
+      tags = JSON.parse(tags);
+    }
+
+    // 3. create product
+    const product = await Product.create({
+      ...req.body,
+      longDescription,
+      tags,
+      imageUrl,
+    });
+
+    res.status(201).json({
+      success: true,
+      data: product,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getProducts = async (req, res) => {
+  try {
+    const products = await Product.find().sort({
+      createdAt: -1,
+    });
+
+    res.json({
+      success: true,
+      data: products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateProduct = async (req, res) => {
+  try {
+    let updateData = { ...req.body };
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(
+        `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+        {
+          folder: "products",
+        }
+      );
+
+      updateData.imageUrl = result.secure_url;
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      data: product,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteProduct = async (req, res) => {
+  try {
+    await Product.findByIdAndDelete(req.params.id);
+
+    res.json({
+      success: true,
+      message: "Product deleted",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
